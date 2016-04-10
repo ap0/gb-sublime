@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"text/template"
 )
 
@@ -35,7 +36,9 @@ func main() {
 
 	tmpl := template.Must(template.New("project").Parse(projectTemplate))
 
-	out, err := os.Create("project.sublime-project")
+	projectName := filepath.Base(wd)
+
+	out, err := os.Create(projectName + ".sublime-project")
 	if err != nil {
 		panic(err)
 	}
