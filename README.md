@@ -47,4 +47,8 @@ $ ./gb-sublime -write-template
 writing template to /home/adam/.gb-sublime-project.template...
 ```
 
-Modify this to your liking, then run `gb project` again and it will use that template.
+Modify this to your liking, then run `gb project` again and it will use that template.  
+
+## Contributing
+
+Hack on this, make it better, submit PRs.
