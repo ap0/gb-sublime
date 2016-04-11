@@ -55,6 +55,7 @@ func main() {
 		}
 		out.WriteString(defaultTemplate)
 		out.Close()
+		fmt.Printf("writing template to %s...\n", fullTemplatePath)
 	}
 
 	f, err := os.Open(fullTemplatePath)
@@ -77,9 +78,10 @@ func main() {
 	tmpl := template.Must(template.New("project").Parse(templateStr))
 
 	projectName := filepath.Base(wd)
+	projectFileName := projectName + ".sublime-project"
 
-	fmt.Printf("writing sublime-project to %s...\n", wd)
-	out, err := os.Create(projectName + ".sublime-project")
+	fmt.Printf("writing %s to %s...\n", projectFileName, wd)
+	out, err := os.Create(projectFileName)
 	if err != nil {
 		panic(err)
 	}
