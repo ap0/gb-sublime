@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path"
@@ -30,7 +31,7 @@ const (
 )
 
 var (
-	writeDefaultTemplate = flag.Bool("write-default", false, "writes default template to ~/"+templateFileName)
+	writeDefaultTemplate = flag.Bool("write-template", false, "writes default template to ~/"+templateFileName)
 )
 
 func main() {
@@ -56,17 +57,28 @@ func main() {
 		out.Close()
 	}
 
-	fmt.Printf("writing sublime-project to %s...\n", wd)
-
 	f, err := os.Open(fullTemplatePath)
-	if err != nil {
+	var templateStr string
+	switch {
+	case os.IsNotExist(err):
+		fmt.Println("template not found in home directory; using default...")
+		templateStr = defaultTemplate
+	case err != nil:
 		panic(fmt.Sprintf("Error opening template file: %s", err.Error()))
+	default:
+		defer f.Close()
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			panic(err)
+		}
+		templateStr = string(b)
 	}
 
-	tmpl := template.Must(template.New("project").Parse())
+	tmpl := template.Must(template.New("project").Parse(templateStr))
 
 	projectName := filepath.Base(wd)
 
+	fmt.Printf("writing sublime-project to %s...\n", wd)
 	out, err := os.Create(projectName + ".sublime-project")
 	if err != nil {
 		panic(err)
