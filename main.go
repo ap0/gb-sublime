@@ -1,14 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"os/user"
+	"path"
 	"path/filepath"
 	"text/template"
 )
 
 const (
-	projectTemplate = `{
+	templateFileName = ".gb-sublime-project.template"
+	defaultTemplate  = `{
     "folders":
     [
         {
@@ -18,23 +22,48 @@ const (
     "settings": {
         "GoSublime": {
             "env": {
-                "GOPATH": "{{ .ProjectDir }}:{{ .ProjectDir }}/vendor",
-                "PATH": "$PATH:$HOME/src/go/bin"
+                "GOPATH": "{{ .ProjectDir }}:{{ .ProjectDir }}/vendor"
             }
         }
     }
-}
-`
+}`
+)
+
+var (
+	writeDefaultTemplate = flag.Bool("write-default", false, "writes default template to ~/"+templateFileName)
 )
 
 func main() {
+	flag.Parse()
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
+
+	u, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+
+	fullTemplatePath := path.Join(u.HomeDir, templateFileName)
+
+	if *writeDefaultTemplate {
+		out, err := os.Create(fullTemplatePath)
+		if err != nil {
+			panic(fmt.Errorf("Error opening template file for writing: %s", err.Error()))
+		}
+		out.WriteString(defaultTemplate)
+		out.Close()
+	}
+
 	fmt.Printf("writing sublime-project to %s...\n", wd)
 
-	tmpl := template.Must(template.New("project").Parse(projectTemplate))
+	f, err := os.Open(fullTemplatePath)
+	if err != nil {
+		panic(fmt.Sprintf("Error opening template file: %s", err.Error()))
+	}
+
+	tmpl := template.Must(template.New("project").Parse())
 
 	projectName := filepath.Base(wd)
 
