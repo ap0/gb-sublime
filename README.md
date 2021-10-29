@@ -1,5 +1,7 @@
 # gb-sublime
 
+## ** This is archived. You should be using Go modules now. **
+
 Simple app that generates a Sublime Text `.sublime-project` file with the `GOPATH` configured for use by [`gb`](https://github.com/constabulary/gb) and [`GoSublime`](https://github.com/DisposaBoy/GoSublime).
 
 ## Installation
